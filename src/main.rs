@@ -1,4 +1,5 @@
 use anyhow::{bail, Result};
+use core::num;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -21,13 +22,16 @@ fn main() -> Result<()> {
 
             // The page size is stored at the 16th byte offset, using 2 bytes in big-endian order
             let page_size = u16::from_be_bytes([header[16], header[17]]);
-            println!("header 16: {}", header[16]);
-            println!("header 17: {}", header[17]);
+
+            let mut page_header = [100; 108];
+            file.read_exact(&mut page_header)?;
+            let num_tables = u16::from_be_bytes([page_header[3], page_header[4]]);
 
             // You can use print statements as follows for debugging, they'll be visible when running tests.
             eprintln!("Logs from your program will appear here!");
 
             println!("database page size: {}", page_size);
+            println!("number of tables: {}", num_tables);
         }
         _ => bail!("Missing or invalid command passed: {}", command),
     }
